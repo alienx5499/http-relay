@@ -15,13 +15,13 @@ CDN usage for serving beacons.
 
 Typically usage, assuming you have a drand node running as:
 ```
-drand start --folder /tmp/drand-full/node --control 33383 --private-listen 0.0.0.0:39107 --public-listen 0.0.0.0:35097 --verbose
+drand start --private-listen 0.0.0.0:443 --public-listen 0.0.0.0:8080 --verbose
 ```
 
-You can replace the `--public-listen 0.0.0.0:35097` flag with this relay by running:
+You can replace the `--public-listen 0.0.0.0:8080` flag with this relay by running:
 ``` 
 make
-./drand-relay-http --grpc-connect "127.0.0.1:35097" --bind 0.0.0.0:35097 --verbose --metrics 127.0.0.1:9992
+./drand-relay-http --grpc-connect "127.0.0.1:443" --bind 0.0.0.0:8080 --verbose --metrics 127.0.0.1:9992
 ```
 
 the `--verbose` and `--metrics` flags are optional, especially the `--verbose` one since it exposes DEBUG level gRPC logs. 
