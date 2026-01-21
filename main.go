@@ -31,6 +31,12 @@ var (
 )
 
 func init() {
+	// Skip flag parsing during tests (Go test injects -test.* flags which are unknown to our flagset).
+	for _, arg := range os.Args {
+		if arg == "-test.v" || arg == "-test.run" || strings.HasPrefix(arg, "-test.") {
+			return
+		}
+	}
 	flag.Parse()
 	slog.SetLogLoggerLevel(getLogLevel())
 }
