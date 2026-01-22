@@ -68,6 +68,13 @@ type logPicker struct {
 func (p *logPicker) Pick(i balancer.PickInfo) (balancer.PickResult, error) {
 	result, err := p.sub.Pick(i)
 
+	// If Pick returned an error, return immediately without accessing result fields
+	// to avoid potential panics from zero-valued result.
+	if err != nil {
+		p.log.Debug("Pick", "rpc", i.FullMethodName, "picker", p.sub, "err", err)
+		return balancer.PickResult{}, err
+	}
+
 	p.log.Debug("Pick", "endpoint", result.SubConn, "rpc", i.FullMethodName, "md", result.Metadata, "picker", p.sub, "err", err)
 	return balancer.PickResult{
 		SubConn: result.SubConn,
@@ -79,10 +86,13 @@ func (p *logPicker) Pick(i balancer.PickInfo) (balancer.PickResult, error) {
 			if info.Err != nil {
 				p.log.Error("Picked SubConn errored", "err", info.Err)
 			}
-			result.Done(info)
+			// Guard result.Done before calling it
+			if result.Done != nil {
+				result.Done(info)
+			}
 		},
 		Metadata: result.Metadata,
-	}, err
+	}, nil
 }
 
 type wrappedClientConn struct {
