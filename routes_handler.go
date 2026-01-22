@@ -25,7 +25,7 @@ func GetBeacon(c *grpc.Client, isV2 bool) func(http.ResponseWriter, *http.Reques
 			w.Header().Set("Cache-Control", "public, max-age=604800, immutable")
 
 			slog.Error("unable to parse round", "error", err)
-			http.Error(w, "Failed to parse round. Err: "+err.Error(), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("Failed to parse round parameter %q: %v", roundStr, err), http.StatusBadRequest)
 			return
 		}
 
@@ -188,11 +188,9 @@ func GetChains(c *grpc.Client) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		chains, err := c.GetChains(r.Context())
 		if err != nil {
-			if err != nil {
-				slog.Error("failed to get chains from all clients", "error", err)
-				http.Error(w, "Failed to get chains", http.StatusInternalServerError)
-				return
-			}
+			slog.Error("failed to get chains from all clients", "error", err)
+			http.Error(w, "Failed to get chains", http.StatusInternalServerError)
+			return
 		}
 
 		json, err := json.Marshal(chains)
@@ -280,6 +278,7 @@ func GetBeaconIds(c *grpc.Client) func(http.ResponseWriter, *http.Request) {
 		if err != nil {
 			slog.Error("[GetBeaconIds] failed to encode beacon ids in json", "error", err)
 			http.Error(w, "Failed to produce beacon ids", http.StatusInternalServerError)
+			return
 		}
 		w.Write(json)
 	}
@@ -296,11 +295,9 @@ func GetInfoV1(c *grpc.Client) func(http.ResponseWriter, *http.Request) {
 
 		chains, err := c.GetChainInfo(r.Context(), m)
 		if err != nil {
-			if err != nil {
-				slog.Error("[GetInfoV1] failed to get ChainInfo from all clients", "error", err)
-				http.Error(w, "Failed to get ChainInfo", http.StatusInternalServerError)
-				return
-			}
+			slog.Error("[GetInfoV1] failed to get ChainInfo from all clients", "error", err)
+			http.Error(w, "Failed to get ChainInfo", http.StatusInternalServerError)
+			return
 		}
 
 		json, err := json.Marshal(chains.V1())
@@ -325,11 +322,9 @@ func GetInfoV2(c *grpc.Client) func(http.ResponseWriter, *http.Request) {
 
 		chains, err := c.GetChainInfo(r.Context(), m)
 		if err != nil {
-			if err != nil {
-				slog.Error("[GetInfoV2] failed to get ChainInfo", "error", err)
-				http.Error(w, "Failed to get ChainInfo", http.StatusInternalServerError)
-				return
-			}
+			slog.Error("[GetInfoV2] failed to get ChainInfo", "error", err)
+			http.Error(w, "Failed to get ChainInfo", http.StatusInternalServerError)
+			return
 		}
 
 		json, err := json.Marshal(chains)

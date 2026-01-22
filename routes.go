@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"slices"
 	"strings"
@@ -123,6 +124,6 @@ func SetupRoutes(r *chi.Mux, client *grpc.Client) {
 		return nil
 	}
 	if err := chi.Walk(r, walkFunc); err != nil {
-		fmt.Printf("Logging err: %s\n", err.Error())
+		slog.Error("failed to walk routes", "error", err)
 	}
 }
