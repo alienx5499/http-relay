@@ -12,6 +12,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"testing"
 	"time"
 
 	"github.com/drand/http-relay/grpc"
@@ -31,6 +32,10 @@ var (
 )
 
 func init() {
+	// Skip flag parsing during tests (Go test injects -test.* flags which are unknown to our flagset).
+	if testing.Testing() {
+		return
+	}
 	flag.Parse()
 	slog.SetLogLoggerLevel(getLogLevel())
 }

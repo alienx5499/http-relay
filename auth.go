@@ -38,7 +38,7 @@ func AddAuth(next http.Handler) http.Handler {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 			return jwtSecret, nil
-		}, jwt.WithValidMethods([]string{"HS256,HS384"}))
+		}, jwt.WithValidMethods([]string{"HS256", "HS384"}))
 		if err != nil {
 			slog.Error("Unable to parse JWT!", "err", err)
 			http.Error(w, "Invalid JWT", http.StatusUnauthorized)
