@@ -145,7 +145,9 @@ func writeBeacon(w http.ResponseWriter, beacon *grpc.HexBeacon, nextTime int64, 
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write(json)
+	if _, err := w.Write(json); err != nil {
+		slog.Error("failed to write beacon response", "error", err)
+	}
 }
 
 func GetLatest(c *grpc.Client, isV2 bool) func(http.ResponseWriter, *http.Request) {
@@ -202,7 +204,9 @@ func GetChains(c *grpc.Client) func(http.ResponseWriter, *http.Request) {
 			return
 		}
 
-		w.Write(json)
+		if _, err := w.Write(json); err != nil {
+			slog.Error("failed to write chains response", "error", err)
+		}
 	}
 }
 
@@ -263,7 +267,9 @@ func GetHealth(c *grpc.Client) func(http.ResponseWriter, *http.Request) {
 			return
 		}
 
-		w.Write(json)
+		if _, err := w.Write(json); err != nil {
+			slog.Error("[GetHealth] failed to write health response", "error", err)
+		}
 	}
 }
 
@@ -280,8 +286,11 @@ func GetBeaconIds(c *grpc.Client) func(http.ResponseWriter, *http.Request) {
 		if err != nil {
 			slog.Error("[GetBeaconIds] failed to encode beacon ids in json", "error", err)
 			http.Error(w, "Failed to produce beacon ids", http.StatusInternalServerError)
+			return
 		}
-		w.Write(json)
+		if _, err := w.Write(json); err != nil {
+			slog.Error("[GetBeaconIds] failed to write beacon ids response", "error", err)
+		}
 	}
 }
 
@@ -310,7 +319,9 @@ func GetInfoV1(c *grpc.Client) func(http.ResponseWriter, *http.Request) {
 			return
 		}
 
-		w.Write(json)
+		if _, err := w.Write(json); err != nil {
+			slog.Error("[GetInfoV1] failed to write chain info response", "error", err)
+		}
 	}
 }
 
@@ -339,7 +350,9 @@ func GetInfoV2(c *grpc.Client) func(http.ResponseWriter, *http.Request) {
 			return
 		}
 
-		w.Write(json)
+		if _, err := w.Write(json); err != nil {
+			slog.Error("[GetInfoV2] failed to write chain info response", "error", err)
+		}
 	}
 }
 
